@@ -37,15 +37,16 @@ function padded (str) {
 }
 
 export function encryption (props) {
-  console.log('TCL: encryption -> props', props)
-  const { iv, key, message } = props
-  const textBytes = aesjs.utils.utf8.toBytes(padded(message))
+  const iv = aesjs.utils.hex.toBytes(props.iv)
+  const key = aesjs.utils.hex.toBytes(props.key)
+  // const key = props.key.match(/.{1,2}/g)
+  const message = aesjs.utils.utf8.toBytes(padded(props.message))
   const aesCbc = new aesjs.ModeOfOperation.cbc(key, iv)
 
-  const encryptedBytes = aesCbc.encrypt(textBytes)
+  const encryptedBytes = aesCbc.encrypt(message)
 
-  const encryptedText = aesjs.utils.hex.fromBytes(encryptedBytes)
-  return encryptedText
+  const encryptedHex = aesjs.utils.hex.fromBytes(encryptedBytes)
+  return encryptedHex
 }
 
 encryption.propTypes = {
@@ -53,7 +54,9 @@ encryption.propTypes = {
 }
 
 export function decryption (props) {
-  const { iv, key, message } = props
+  const iv = aesjs.utils.hex.toBytes(props.iv)
+  const key = aesjs.utils.hex.toBytes(props.key)
+  const message = props.message
   console.log('TCL: decryption -> props', props)
   const encryptedBytes = aesjs.utils.hex.toBytes(message)
   const aesCbc = new aesjs.ModeOfOperation.cbc(key, iv)
@@ -71,42 +74,8 @@ decryption.propTypes = {
 export default function CBCMode () {
   const classes = useStyles()
   const [input, setInput] = useState({
-    iv: [
-      0x00,
-      0x00,
-      0x00,
-      0x00,
-      0x00,
-      0x00,
-      0x00,
-      0x00,
-      0x00,
-      0x00,
-      0x00,
-      0x00,
-      0x00,
-      0x00,
-      0x00,
-      0x00
-    ],
-    key: [
-      0x41,
-      0x73,
-      0x73,
-      0x69,
-      0x67,
-      0x6e,
-      0x6d,
-      0x65,
-      0x6e,
-      0x74,
-      0x20,
-      0x31,
-      0x20,
-      0x4b,
-      0x65,
-      0x79
-    ],
+    iv: '00000000000000000000000000000000',
+    key: '41737369676e6d656e74203120434243',
     message: 'testMessage'
   })
   const [output, setOutput] = useState({
@@ -149,7 +118,7 @@ export default function CBCMode () {
             label='Initialization vector'
             variant='filled'
             disabled
-            value={input.iv.join(' ')}
+            value={input.iv}
             onChange={handleInputChange}
             className={classes.iv}
           />
@@ -159,7 +128,7 @@ export default function CBCMode () {
             name='key'
             label='Key'
             variant='outlined'
-            value={input.key.join(' ')}
+            value={input.key}
             onChange={handleInputChange}
             className={classes.key}
             autoComplete='off'

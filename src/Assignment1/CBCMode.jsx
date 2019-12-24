@@ -1,6 +1,4 @@
 import React, { useState } from 'react'
-import aesjs from 'aes-js'
-import PropTypes from 'prop-types'
 import {
   Button,
   Grid,
@@ -13,7 +11,7 @@ import VpnKeyIcon from '@material-ui/icons/VpnKey'
 import LockIcon from '@material-ui/icons/Lock'
 import MessageIcon from '@material-ui/icons/Message'
 import NoEncryptionIcon from '@material-ui/icons/NoEncryption'
-import { EncryptedOutput, DecryptedOutput } from '../components/Output'
+import Output from '../components/Output'
 
 const useStyles = makeStyles(theme => ({
   icon: {
@@ -21,57 +19,19 @@ const useStyles = makeStyles(theme => ({
     opacity: 0.5
   },
   iv: {
-    width: 200
+    width: 360
   },
   key: {
-    width: 300
+    width: 360
   },
   message: {
-    width: 508
+    width: 728
   }
 }))
 
-function padded (str) {
-  const len = Math.ceil(str.length / 16.0) * 16
-  return str.length === len ? str : str.padEnd(len, null)
-}
-
-export function encryption (props) {
-  const iv = aesjs.utils.hex.toBytes(props.iv)
-  const key = aesjs.utils.hex.toBytes(props.key)
-  // const key = props.key.match(/.{1,2}/g)
-  const message = aesjs.utils.utf8.toBytes(padded(props.message))
-  const aesCbc = new aesjs.ModeOfOperation.cbc(key, iv)
-
-  const encryptedBytes = aesCbc.encrypt(message)
-
-  const encryptedHex = aesjs.utils.hex.fromBytes(encryptedBytes)
-  return encryptedHex
-}
-
-encryption.propTypes = {
-  props: PropTypes.object.isRequired
-}
-
-export function decryption (props) {
-  const iv = aesjs.utils.hex.toBytes(props.iv)
-  const key = aesjs.utils.hex.toBytes(props.key)
-  const message = props.message
-  console.log('TCL: decryption -> props', props)
-  const encryptedBytes = aesjs.utils.hex.toBytes(message)
-  const aesCbc = new aesjs.ModeOfOperation.cbc(key, iv)
-
-  const decryptedBytes = aesCbc.decrypt(encryptedBytes)
-
-  const decryptedText = aesjs.utils.utf8.fromBytes(decryptedBytes)
-  return decryptedText
-}
-
-decryption.propTypes = {
-  props: PropTypes.object.isRequired
-}
-
 export default function CBCMode () {
+  const crypto = require('crypto')
+  const algorithm = 'aes-128-cbc'
   const classes = useStyles()
   const [input, setInput] = useState({
     iv: '00000000000000000000000000000000',
@@ -83,6 +43,26 @@ export default function CBCMode () {
     message: input.message
   })
 
+  const encrypt = (props) => {
+    const iv = Buffer.from(props.iv, 'hex')
+    const key = Buffer.from(props.key, 'hex')
+    const message = Buffer.from(props.message, 'utf8')
+    const cipher = crypto.createCipheriv(algorithm, key, iv)
+    let encrypted = cipher.update(message)
+    encrypted = Buffer.concat([encrypted, cipher.final()])
+    return encrypted.toString('hex')
+  }
+
+  const decrypt = (props) => {
+    const iv = Buffer.from(props.iv, 'hex')
+    const key = Buffer.from(props.key, 'hex')
+    const encryptedMessage = Buffer.from(props.message, 'hex')
+    const decipher = crypto.createDecipheriv(algorithm, key, iv)
+    let decrypted = decipher.update(encryptedMessage)
+    decrypted = Buffer.concat([decrypted, decipher.final()])
+    return decrypted.toString()
+  }
+
   const handleInputChange = event => {
     setInput({ ...input, [event.target.name]: event.target.value })
   }
@@ -90,14 +70,14 @@ export default function CBCMode () {
   const encryptInput = () => {
     setOutput({
       state: 'encrypted',
-      message: encryption(input)
+      message: encrypt(input)
     })
   }
 
   const decryptInput = () => {
     setOutput({
       state: 'decrypted',
-      message: decryption(input)
+      message: decrypt(input)
     })
   }
 
@@ -116,7 +96,7 @@ export default function CBCMode () {
         <Grid item>
           <TextField
             label='Initialization vector'
-            variant='filled'
+            variant='outlined'
             disabled
             value={input.iv}
             onChange={handleInputChange}
@@ -151,7 +131,7 @@ export default function CBCMode () {
           onChange={handleInputChange}
           className={classes.message}
           multiline
-          rows={3}
+          rows={7}
           InputProps={{
             startAdornment: (
               <InputAdornment position='start'>
@@ -165,7 +145,7 @@ export default function CBCMode () {
         <Grid item>
           <Button
             variant='contained'
-            color='secondary'
+            color='primary'
             startIcon={<LockIcon />}
             onClick={encryptInput}
           >
@@ -185,10 +165,8 @@ export default function CBCMode () {
         </Grid>
       </Grid>
       <Grid item>
-        {output.state === 'encrypted' ? (
-          <EncryptedOutput message={output.message} />
-        ) : output.state === 'decrypted' ? (
-          <DecryptedOutput message={output.message} />
+        {output.state !== '' ? (
+          <Output props={output} />
         ) : (
           <Typography>Input Key & Message to Encrypt/Decrypt</Typography>
         )}

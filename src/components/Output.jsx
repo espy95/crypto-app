@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import {
   Button,
   InputAdornment,
@@ -10,77 +9,57 @@ import LockIcon from '@material-ui/icons/Lock'
 import NoEncryptionIcon from '@material-ui/icons/NoEncryption'
 
 const useStyles = makeStyles(theme => ({
-  icon: {
-    color: '#808080',
-    opacity: 0.5
+  encryptedIcon: {
+    color: theme.palette.primary.main
+  },
+  decryptedIcon: {
+    color: theme.palette.secondary.main
   },
   message: {
-    width: 508
+    width: 728
+  },
+  encrypted: {
+    borderColor: 'red'
+  },
+  decrypted: {
+    borderColor: 'green'
   }
 }))
 
-export const handleCopy = () => {
-  const copyText = document.getElementById('output')
-  copyText.select()
-  document.execCommand('copy')
-}
-
-export function EncryptedOutput (props) {
+export default function Output ({ props }) {
   const classes = useStyles()
-  const { message } = props
+  const { state, message } = props
+
+  const handleCopy = () => {
+    const copyText = document.getElementById('output')
+    copyText.select()
+    document.execCommand('copy')
+  }
+
   return (
     <TextField
       id='output'
-      label='Encrypted Output'
+      label={state + ' output'}
       variant='outlined'
       value={message}
       readOnly
       className={classes.message}
       onFocus={handleCopy}
       multiline
-      rows={3}
+      rows={7}
+      color={state === 'encrypted' ? 'primary' : 'secondary'}
       InputProps={{
         startAdornment: (
           <InputAdornment position='start'>
-            <LockIcon className={classes.icon} />
+            {state === 'encrypted' ? (
+              <LockIcon className={classes.encryptedIcon} />
+            ) : (
+              <NoEncryptionIcon className={classes.decryptedIcon} />
+            )}
           </InputAdornment>
         ),
         endAdornment: <Button onClick={handleCopy}>Copy</Button>
       }}
     />
   )
-}
-
-EncryptedOutput.propTypes = {
-  props: PropTypes.string
-}
-
-export function DecryptedOutput (props) {
-  const classes = useStyles()
-  const { message } = props
-  return (
-    <TextField
-      id='output'
-      label='Decrypted Output'
-      variant='outlined'
-      value={message}
-      readOnly
-      className={classes.message}
-      onFocus={handleCopy}
-      multiline
-      rows={3}
-      InputProps={{
-        startAdornment: (
-          <InputAdornment position='start'>
-            <NoEncryptionIcon className={classes.icon} />
-          </InputAdornment>
-        ),
-        endAdornment: <Button onClick={handleCopy}>Copy</Button>
-      }}
-    />
-  )
-}
-
-DecryptedOutput.propTypes = {
-  props: PropTypes.string
 }

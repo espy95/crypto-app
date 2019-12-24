@@ -13,6 +13,7 @@ import VpnKeyIcon from '@material-ui/icons/VpnKey'
 import LockIcon from '@material-ui/icons/Lock'
 import MessageIcon from '@material-ui/icons/Message'
 import NoEncryptionIcon from '@material-ui/icons/NoEncryption'
+import { EncryptedOutput, DecryptedOutput } from '../components/Output'
 
 const useStyles = makeStyles(theme => ({
   icon: {
@@ -110,8 +111,7 @@ export default function CBCMode () {
   })
   const [output, setOutput] = useState({
     state: '',
-    message: input.message,
-    copied: false
+    message: input.message
   })
 
   const handleInputChange = event => {
@@ -120,7 +120,6 @@ export default function CBCMode () {
 
   const encryptInput = () => {
     setOutput({
-      ...output,
       state: 'encrypted',
       message: encryption(input)
     })
@@ -128,16 +127,9 @@ export default function CBCMode () {
 
   const decryptInput = () => {
     setOutput({
-      ...output,
       state: 'decrypted',
       message: decryption(input)
     })
-  }
-
-  const handleCopy = () => {
-    const copyText = document.getElementById('output')
-    copyText.select()
-    document.execCommand('copy')
   }
 
   return (
@@ -200,12 +192,7 @@ export default function CBCMode () {
           }}
         />
       </Grid>
-      <Grid
-        container
-        spacing={1}
-        justify='center'
-        alignItems='center'
-      >
+      <Grid container spacing={1} justify='center' alignItems='center'>
         <Grid item>
           <Button
             variant='contained'
@@ -213,7 +200,7 @@ export default function CBCMode () {
             startIcon={<LockIcon />}
             onClick={encryptInput}
           >
-              Encrypt
+            Encrypt
           </Button>
         </Grid>
 
@@ -224,58 +211,17 @@ export default function CBCMode () {
             startIcon={<NoEncryptionIcon />}
             onClick={decryptInput}
           >
-              Decrypt
+            Decrypt
           </Button>
         </Grid>
       </Grid>
       <Grid item>
-
         {output.state === 'encrypted' ? (
-          <TextField
-            id='output'
-            label='Encrypted Output'
-            variant='outlined'
-            value={output.message}
-            readOnly
-            className={classes.message}
-            onFocus={handleCopy}
-            multiline
-            rows={3}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position='start'>
-                  <LockIcon className={classes.icon} />
-                </InputAdornment>
-              ),
-              endAdornment: (
-                <Button onClick={handleCopy}>Copy</Button>
-              )
-            }}
-          />
+          <EncryptedOutput message={output.message} />
         ) : output.state === 'decrypted' ? (
-          <TextField
-            id='output'
-            label='Decrypted Output'
-            variant='outlined'
-            value={output.message}
-            readOnly
-            className={classes.message}
-            onFocus={handleCopy}
-            multiline
-            rows={3}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position='start'>
-                  <NoEncryptionIcon className={classes.icon} />
-                </InputAdornment>
-              ),
-              endAdornment: (
-                <Button onClick={handleCopy}>Copy</Button>
-              )
-            }}
-          />
+          <DecryptedOutput message={output.message} />
         ) : (
-          <></>
+          <Typography>Input Key & Message to Encrypt/Decrypt</Typography>
         )}
       </Grid>
     </Grid>

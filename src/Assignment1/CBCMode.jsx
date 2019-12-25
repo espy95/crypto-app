@@ -12,6 +12,7 @@ import LockIcon from '@material-ui/icons/Lock'
 import MessageIcon from '@material-ui/icons/Message'
 import NoEncryptionIcon from '@material-ui/icons/NoEncryption'
 import Output from '../components/Output'
+import crypto from 'crypto'
 
 const useStyles = makeStyles(theme => ({
   icon: {
@@ -19,18 +20,17 @@ const useStyles = makeStyles(theme => ({
     opacity: 0.5
   },
   iv: {
-    width: 360
+    width: 420
   },
   key: {
-    width: 360
+    width: 420
   },
   message: {
-    width: 728
+    width: 420
   }
 }))
 
 export default function CBCMode () {
-  const crypto = require('crypto')
   const algorithm = 'aes-128-cbc'
   const classes = useStyles()
   const [input, setInput] = useState({
@@ -92,35 +92,33 @@ export default function CBCMode () {
       <Grid item>
         <Typography variant='h4'>Cipher-Block Chaining Mode</Typography>
       </Grid>
-      <Grid container spacing={1} justify='center' alignItems='center'>
-        <Grid item>
-          <TextField
-            label='Initialization vector'
-            variant='outlined'
-            disabled
-            value={input.iv}
-            onChange={handleInputChange}
-            className={classes.iv}
-          />
-        </Grid>
-        <Grid item>
-          <TextField
-            name='key'
-            label='Key'
-            variant='outlined'
-            value={input.key}
-            onChange={handleInputChange}
-            className={classes.key}
-            autoComplete='off'
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position='start'>
-                  <VpnKeyIcon className={classes.icon} />
-                </InputAdornment>
-              )
-            }}
-          />
-        </Grid>
+      <Grid item>
+        <TextField
+          label='Initialization vector'
+          variant='outlined'
+          disabled
+          value={input.iv}
+          onChange={handleInputChange}
+          className={classes.iv}
+        />
+      </Grid>
+      <Grid item>
+        <TextField
+          name='key'
+          label='Key'
+          variant='outlined'
+          value={input.key}
+          onChange={handleInputChange}
+          className={classes.key}
+          autoComplete='off'
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position='start'>
+                <VpnKeyIcon className={classes.icon} />
+              </InputAdornment>
+            )
+          }}
+        />
       </Grid>
       <Grid item>
         <TextField
@@ -131,7 +129,7 @@ export default function CBCMode () {
           onChange={handleInputChange}
           className={classes.message}
           multiline
-          rows={7}
+          rows={5}
           InputProps={{
             startAdornment: (
               <InputAdornment position='start'>

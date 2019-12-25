@@ -6,8 +6,8 @@ import {
 } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import TabPanel from '../components/TabPanel'
-import OFBMode from './OFBMode'
 import CBCMode from './CBCMode'
+import CFBMode from './CFBMode'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -23,7 +23,7 @@ const useStyles = makeStyles(theme => ({
 
 export default function Assignment1 () {
   const classes = useStyles()
-  const [tab, setTab] = useState(0)
+  const [tab, setTab] = useState(1)
   const handleChange = (event, newTab) => {
     setTab(newTab)
   }
@@ -39,8 +39,8 @@ export default function Assignment1 () {
             onChange={handleChange}
             className={classes.tabs}
           >
-            <Tab label='CBC chaining mode' />
-            <Tab label='OFB chaining mode' />
+            <Tab label='Cipher-Block (CBC)' />
+            <Tab label='Cipher Feedback (CFB)' />
           </Tabs>
         </Grid>
         <Grid item xs={10}>
@@ -48,7 +48,7 @@ export default function Assignment1 () {
             <CBCMode />
           </TabPanel>
           <TabPanel value={tab} index={1}>
-            <OFBMode />
+            <CFBMode />
           </TabPanel>
         </Grid>
       </Grid>

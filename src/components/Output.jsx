@@ -16,7 +16,7 @@ const useStyles = makeStyles(theme => ({
     color: theme.palette.secondary.main
   },
   message: {
-    width: 728
+    width: 420
   },
   encrypted: {
     borderColor: 'red'
@@ -46,7 +46,7 @@ export default function Output ({ props }) {
       className={classes.message}
       onFocus={handleCopy}
       multiline
-      rows={7}
+      rows={5}
       color={state === 'encrypted' ? 'primary' : 'secondary'}
       InputProps={{
         startAdornment: (

@@ -58,7 +58,9 @@ export default function Output ({ props }) {
             )}
           </InputAdornment>
         ),
-        endAdornment: <Button onClick={handleCopy}>Copy</Button>
+        endAdornment: (
+          <Button onClick={handleCopy}>Copy</Button>
+        )
       }}
     />
   )

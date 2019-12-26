@@ -12,7 +12,7 @@ import LockIcon from '@material-ui/icons/Lock'
 import MessageIcon from '@material-ui/icons/Message'
 import NoEncryptionIcon from '@material-ui/icons/NoEncryption'
 import Output from '../components/Output'
-import FileEncryption from '../components/File'
+import { FileUpload, FileDownload } from '../components/FileTransfer'
 import crypto from 'crypto'
 
 const useStyles = makeStyles(theme => ({
@@ -21,7 +21,8 @@ const useStyles = makeStyles(theme => ({
     opacity: 0.5
   },
   iv: {
-    width: 420
+    width: 420,
+    marginRight: 64
   },
   key: {
     width: 420
@@ -44,7 +45,7 @@ export default function CFBMode () {
     message: input.message
   })
 
-  const encrypt = (props) => {
+  const encrypt = props => {
     const iv = Buffer.from(props.iv, 'hex')
     const key = Buffer.from(props.key, 'hex')
     const message = Buffer.from(props.message, 'utf8')
@@ -54,7 +55,7 @@ export default function CFBMode () {
     return encrypted.toString('hex')
   }
 
-  const decrypt = (props) => {
+  const decrypt = props => {
     const iv = Buffer.from(props.iv, 'hex')
     const key = Buffer.from(props.key, 'hex')
     const encryptedMessage = Buffer.from(props.message, 'hex')
@@ -82,6 +83,14 @@ export default function CFBMode () {
     })
   }
 
+  const handleUpload = (fileInput, type) => {
+    console.log('TCL: handleUpload -> fileInput', fileInput)
+    setInput({
+      ...input,
+      [type]: fileInput
+    })
+  }
+
   return (
     <Grid
       container
@@ -104,43 +113,57 @@ export default function CFBMode () {
         />
       </Grid>
       <Grid item>
-        <TextField
-          name='key'
-          label='Key'
-          variant='outlined'
-          value={input.key}
-          onChange={handleInputChange}
-          className={classes.key}
-          autoComplete='off'
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position='start'>
-                <VpnKeyIcon className={classes.icon} />
-              </InputAdornment>
-            )
-          }}
-        />
+        <Grid container justify='center' alignItems='center' spacing={1}>
+          <Grid item>
+            <TextField
+              name='key'
+              label='Key'
+              variant='outlined'
+              value={input.key}
+              onChange={handleInputChange}
+              className={classes.key}
+              autoComplete='off'
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position='start'>
+                    <VpnKeyIcon className={classes.icon} />
+                  </InputAdornment>
+                )
+              }}
+            />
+          </Grid>
+          <Grid item>
+            <FileUpload onUpload={file => handleUpload(file, 'key')} />
+          </Grid>
+        </Grid>
       </Grid>
       <Grid item>
-        <TextField
-          name='message'
-          label='Message'
-          variant='outlined'
-          value={input.message}
-          onChange={handleInputChange}
-          className={classes.message}
-          multiline
-          rows={5}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position='start'>
-                <MessageIcon className={classes.icon} />
-              </InputAdornment>
-            )
-          }}
-        />
+        <Grid container justify='center' alignItems='center' spacing={1}>
+          <Grid item>
+            <TextField
+              name='message'
+              label='Message'
+              variant='outlined'
+              value={input.message}
+              onChange={handleInputChange}
+              className={classes.message}
+              multiline
+              rows={5}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position='start'>
+                    <MessageIcon className={classes.icon} />
+                  </InputAdornment>
+                )
+              }}
+            />
+          </Grid>
+          <Grid item>
+            <FileUpload onUpload={file => handleUpload(file, 'message')} />
+          </Grid>
+        </Grid>
       </Grid>
-      <Grid container spacing={1} justify='center' alignItems='center'>
+      <Grid container spacing={2} justify='center' alignItems='center'>
         <Grid item>
           <Button
             variant='contained'
@@ -165,13 +188,17 @@ export default function CFBMode () {
       </Grid>
       <Grid item>
         {output.state !== '' ? (
-          <Output props={output} />
+          <Grid container justify='center' alignItems='center' spacing={1}>
+            <Grid item>
+              <Output props={output} />
+            </Grid>
+            <Grid item>
+              <FileDownload fileOutput={output} />
+            </Grid>
+          </Grid>
         ) : (
           <Typography>Input Key & Message to Encrypt/Decrypt</Typography>
         )}
-      </Grid>
-      <Grid item>
-        <FileEncryption />
       </Grid>
     </Grid>
   )

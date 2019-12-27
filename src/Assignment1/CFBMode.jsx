@@ -1,16 +1,23 @@
 import React, { useState } from 'react'
 import {
   Button,
+  Card,
+  CardHeader,
+  CardContent,
+  CardActions,
   Grid,
   InputAdornment,
   TextField,
-  Typography
+  Typography,
+  Fab
 } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
-import VpnKeyIcon from '@material-ui/icons/VpnKey'
+import AddIcon from '@material-ui/icons/Add'
 import LockIcon from '@material-ui/icons/Lock'
 import MessageIcon from '@material-ui/icons/Message'
 import NoEncryptionIcon from '@material-ui/icons/NoEncryption'
+import RefreshIcon from '@material-ui/icons/Refresh'
+import VpnKeyIcon from '@material-ui/icons/VpnKey'
 import Output from '../components/Output'
 import { FileUpload, FileDownload } from '../components/FileTransfer'
 import crypto from 'crypto'
@@ -19,6 +26,12 @@ const useStyles = makeStyles(theme => ({
   icon: {
     color: '#808080',
     opacity: 0.5
+  },
+  card: {
+    marginRight: 64
+  },
+  cardActions: {
+    justifyContent: 'flex-end'
   },
   iv: {
     width: 420,
@@ -37,8 +50,8 @@ export default function CFBMode () {
   const classes = useStyles()
   const [input, setInput] = useState({
     iv: crypto.randomBytes(16).toString('hex'),
-    key: crypto.randomBytes(16).toString('hex'),
-    message: 'testMessage'
+    keys: [crypto.randomBytes(16).toString('hex')],
+    message: 'Assignment 1 Cipher Feedback Chaining Mode:\ntest Message'
   })
   const [output, setOutput] = useState({
     state: '',
@@ -67,6 +80,27 @@ export default function CFBMode () {
 
   const handleInputChange = event => {
     setInput({ ...input, [event.target.name]: event.target.value })
+  }
+
+  const handleIvChange = () => {
+    setInput({
+      ...input,
+      iv: crypto.randomBytes(16).toString('hex')
+    })
+  }
+
+  const handleAddKey = () => {
+    setInput({
+      ...input,
+      keys: [...input.keys, [crypto.randomBytes(16).toString('hex')]]
+    })
+  }
+
+  const handleKeyChange = () => {
+    setInput({
+      ...input,
+      keys: input.keys.map(() => crypto.randomBytes(16).toString('hex'))
+    })
   }
 
   const encryptInput = () => {
@@ -106,36 +140,67 @@ export default function CFBMode () {
         <TextField
           label='Initialization vector'
           variant='outlined'
-          disabled
+          readOnly
           value={input.iv}
           onChange={handleInputChange}
           className={classes.iv}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position='end'>
+                <Button onClick={handleIvChange}>
+                  <RefreshIcon className={classes.icon} />
+                </Button>
+              </InputAdornment>
+            )
+          }}
         />
       </Grid>
       <Grid item>
-        <Grid container justify='center' alignItems='center' spacing={1}>
-          <Grid item>
-            <TextField
-              name='key'
-              label='Key'
-              variant='outlined'
-              value={input.key}
-              onChange={handleInputChange}
-              className={classes.key}
-              autoComplete='off'
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position='start'>
-                    <VpnKeyIcon className={classes.icon} />
-                  </InputAdornment>
+        <Card className={classes.card}>
+          <CardHeader title='Keys' />
+          <CardContent>
+            <Grid
+              container
+              direction='column'
+              justify='center'
+              alignItems='center'
+              spacing={1}
+            >
+              {input.keys.map((key, i) => {
+                return (
+                  <Grid item key={i}>
+                    <TextField
+                      name='keys'
+                      label={'Key ' + i}
+                      variant='outlined'
+                      value={key}
+                      onChange={handleInputChange}
+                      className={classes.key}
+                      autoComplete='off'
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position='start'>
+                            <VpnKeyIcon className={classes.icon} />
+                          </InputAdornment>
+                        )
+                      }}
+                    />
+                  </Grid>
                 )
-              }}
-            />
-          </Grid>
-          <Grid item>
+              })}
+            </Grid>
+          </CardContent>
+          <CardActions className={classes.cardActions}>
+            <Fab onClick={handleAddKey}>
+              <AddIcon />
+            </Fab>
+            <Fab onClick={handleKeyChange}>
+              <RefreshIcon />
+            </Fab>
             <FileUpload onUpload={file => handleUpload(file, 'key')} />
-          </Grid>
-        </Grid>
+            <FileDownload fileOutput={{ state: 'keys', message: input.keys.join('\n') }} />
+          </CardActions>
+        </Card>
       </Grid>
       <Grid item>
         <Grid container justify='center' alignItems='center' spacing={1}>

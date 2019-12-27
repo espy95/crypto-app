@@ -7,10 +7,11 @@ import {
   Typography
 } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
-import VpnKeyIcon from '@material-ui/icons/VpnKey'
 import LockIcon from '@material-ui/icons/Lock'
 import MessageIcon from '@material-ui/icons/Message'
 import NoEncryptionIcon from '@material-ui/icons/NoEncryption'
+import RefreshIcon from '@material-ui/icons/Refresh'
+import VpnKeyIcon from '@material-ui/icons/VpnKey'
 import Output from '../components/Output'
 import { FileUpload, FileDownload } from '../components/FileTransfer'
 import crypto from 'crypto'
@@ -38,7 +39,7 @@ export default function CBCMode () {
   const [input, setInput] = useState({
     iv: '00000000000000000000000000000000',
     key: crypto.randomBytes(16).toString('hex'),
-    message: 'testMessage'
+    message: 'Assignment 1 Cipher-Block Chaining Mode:\ntest Message'
   })
   const [output, setOutput] = useState({
     state: '',
@@ -67,6 +68,10 @@ export default function CBCMode () {
 
   const handleInputChange = event => {
     setInput({ ...input, [event.target.name]: event.target.value })
+  }
+
+  const handleChange = () => {
+    setInput({ ...input, key: crypto.randomBytes(16).toString('hex') })
   }
 
   const encryptInput = () => {
@@ -126,6 +131,13 @@ export default function CBCMode () {
                 startAdornment: (
                   <InputAdornment position='start'>
                     <VpnKeyIcon className={classes.icon} />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position='end'>
+                    <Button onClick={handleChange}>
+                      <RefreshIcon className={classes.icon} />
+                    </Button>
                   </InputAdornment>
                 )
               }}

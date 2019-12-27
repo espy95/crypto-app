@@ -19,6 +19,12 @@ const useStyles = makeStyles(theme => ({
   icon: {
     color: '#808080',
     opacity: 0.5
+  },
+  mac: {
+    color: theme.palette.primary.main
+  },
+  key: {
+    color: theme.palette.secondary.main
   }
 }))
 
@@ -61,7 +67,7 @@ export default function InputField ({ name, input, onChange, ...props }) {
             startAdornment: (
               <InputAdornment position='start'>
                 {name === 'key' || name === 'mac' ? (
-                  <VpnKeyIcon className={classes.icon} />
+                  <VpnKeyIcon className={`${classes.icon} ${classes[name]}`} />
                 ) : name === 'message' && (
                   <MessageIcon className={classes.icon} />
                 )}

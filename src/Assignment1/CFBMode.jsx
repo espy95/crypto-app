@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
+import throttle from 'lodash/throttle'
 import { Grid, Typography } from '@material-ui/core'
 import Actions from '../components/Actions'
 import InputField from '../components/InputField'
 import OutputField from '../components/OutputField'
 import crypto from 'crypto'
-// import aesCmac from 'node-aes-cmac'
-var aesCmac = require('node-aes-cmac').aesCmac
+import { aesCmac } from 'node-aes-cmac'
 
 const initialInput = {
   iv: crypto.randomBytes(16).toString('hex'),
@@ -15,7 +15,6 @@ const initialInput = {
 
 export default function CFBMode () {
   const algorithm = 'aes-128-cfb'
-
   const [input, setInput] = useState({
     ...initialInput,
     mac: aesCmac(
@@ -23,7 +22,7 @@ export default function CFBMode () {
       initialInput.message
     ).toString('hex')
   })
-  console.log('CFB input', input)
+
   const [output, setOutput] = useState({
     state: '',
     message: input.message
@@ -32,7 +31,7 @@ export default function CFBMode () {
   const encrypt = props => {
     const iv = Buffer.from(props.iv, 'hex')
     const key = Buffer.from(props.key, 'hex')
-    const cmac = Buffer.from(props.mac, 'hex')
+    // const cmac = Buffer.from(props.mac, 'hex')
     const message = Buffer.from(props.message, 'utf8')
     const cipher = crypto.createCipheriv(algorithm, key, iv)
     let encrypted = cipher.update(message)
@@ -93,13 +92,13 @@ export default function CFBMode () {
         <InputField name='mac' input={input.mac} onChange={handleChange} disabled />
       </Grid>
       <Grid item>
-        <InputField name='key' input={input.key} onChange={handleChange} />
+        <InputField name='key' input={input.key} onChange={handleChange} disabled />
       </Grid>
       <Grid item>
         <InputField
           name='message'
           input={input.message}
-          onChange={handleChange}
+          onChange={throttle(handleChange, 1000)}
           multiline
           rows={5}
         />

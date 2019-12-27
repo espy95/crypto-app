@@ -1,58 +1,29 @@
 import React, { useState } from 'react'
-import {
-  Button,
-  Card,
-  CardHeader,
-  CardContent,
-  CardActions,
-  Grid,
-  InputAdornment,
-  TextField,
-  Typography,
-  Fab
-} from '@material-ui/core'
-import { makeStyles } from '@material-ui/core/styles'
-import AddIcon from '@material-ui/icons/Add'
-import LockIcon from '@material-ui/icons/Lock'
-import MessageIcon from '@material-ui/icons/Message'
-import NoEncryptionIcon from '@material-ui/icons/NoEncryption'
-import RefreshIcon from '@material-ui/icons/Refresh'
-import VpnKeyIcon from '@material-ui/icons/VpnKey'
-import Output from '../components/Output'
-import { FileUpload, FileDownload } from '../components/FileTransfer'
+import { Grid, Typography } from '@material-ui/core'
+import Actions from '../components/Actions'
+import InputField from '../components/InputField'
+import OutputField from '../components/OutputField'
 import crypto from 'crypto'
+// import aesCmac from 'node-aes-cmac'
+var aesCmac = require('node-aes-cmac').aesCmac
 
-const useStyles = makeStyles(theme => ({
-  icon: {
-    color: '#808080',
-    opacity: 0.5
-  },
-  card: {
-    marginRight: 64
-  },
-  cardActions: {
-    justifyContent: 'flex-end'
-  },
-  iv: {
-    width: 420,
-    marginRight: 64
-  },
-  key: {
-    width: 420
-  },
-  message: {
-    width: 420
-  }
-}))
+const initialInput = {
+  iv: crypto.randomBytes(16).toString('hex'),
+  key: crypto.randomBytes(16).toString('hex'),
+  message: 'Assignment 1 Cipher Feedback Chaining Mode:\ntest Message'
+}
 
 export default function CFBMode () {
   const algorithm = 'aes-128-cfb'
-  const classes = useStyles()
+
   const [input, setInput] = useState({
-    iv: crypto.randomBytes(16).toString('hex'),
-    keys: [crypto.randomBytes(16).toString('hex')],
-    message: 'Assignment 1 Cipher Feedback Chaining Mode:\ntest Message'
+    ...initialInput,
+    mac: aesCmac(
+      initialInput.key,
+      initialInput.message
+    ).toString('hex')
   })
+  console.log('CFB input', input)
   const [output, setOutput] = useState({
     state: '',
     message: input.message
@@ -61,6 +32,7 @@ export default function CFBMode () {
   const encrypt = props => {
     const iv = Buffer.from(props.iv, 'hex')
     const key = Buffer.from(props.key, 'hex')
+    const cmac = Buffer.from(props.mac, 'hex')
     const message = Buffer.from(props.message, 'utf8')
     const cipher = crypto.createCipheriv(algorithm, key, iv)
     let encrypted = cipher.update(message)
@@ -78,28 +50,14 @@ export default function CFBMode () {
     return decrypted.toString()
   }
 
-  const handleInputChange = event => {
-    setInput({ ...input, [event.target.name]: event.target.value })
-  }
-
-  const handleIvChange = () => {
+  const handleChange = (name, value) => {
     setInput({
       ...input,
-      iv: crypto.randomBytes(16).toString('hex')
-    })
-  }
-
-  const handleAddKey = () => {
-    setInput({
-      ...input,
-      keys: [...input.keys, [crypto.randomBytes(16).toString('hex')]]
-    })
-  }
-
-  const handleKeyChange = () => {
-    setInput({
-      ...input,
-      keys: input.keys.map(() => crypto.randomBytes(16).toString('hex'))
+      [name]: value,
+      mac: aesCmac(
+        name === 'key' ? value : input.key,
+        name === 'message' ? value : input.message
+      )
     })
   }
 
@@ -117,14 +75,6 @@ export default function CFBMode () {
     })
   }
 
-  const handleUpload = (fileInput, type) => {
-    console.log('TCL: handleUpload -> fileInput', fileInput)
-    setInput({
-      ...input,
-      [type]: fileInput
-    })
-  }
-
   return (
     <Grid
       container
@@ -137,133 +87,28 @@ export default function CFBMode () {
         <Typography variant='h4'>Cipher Feedback Chaining Mode</Typography>
       </Grid>
       <Grid item>
-        <TextField
-          label='Initialization vector'
-          variant='outlined'
-          readOnly
-          value={input.iv}
-          onChange={handleInputChange}
-          className={classes.iv}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position='end'>
-                <Button onClick={handleIvChange}>
-                  <RefreshIcon className={classes.icon} />
-                </Button>
-              </InputAdornment>
-            )
-          }}
+        <InputField name='iv' input={input.iv} onChange={handleChange} disabled />
+      </Grid>
+      <Grid item>
+        <InputField name='mac' input={input.mac} onChange={handleChange} disabled />
+      </Grid>
+      <Grid item>
+        <InputField name='key' input={input.key} onChange={handleChange} />
+      </Grid>
+      <Grid item>
+        <InputField
+          name='message'
+          input={input.message}
+          onChange={handleChange}
+          multiline
+          rows={5}
         />
       </Grid>
       <Grid item>
-        <Card className={classes.card}>
-          <CardHeader title='Keys' />
-          <CardContent>
-            <Grid
-              container
-              direction='column'
-              justify='center'
-              alignItems='center'
-              spacing={1}
-            >
-              {input.keys.map((key, i) => {
-                return (
-                  <Grid item key={i}>
-                    <TextField
-                      name='keys'
-                      label={'Key ' + i}
-                      variant='outlined'
-                      value={key}
-                      onChange={handleInputChange}
-                      className={classes.key}
-                      autoComplete='off'
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position='start'>
-                            <VpnKeyIcon className={classes.icon} />
-                          </InputAdornment>
-                        )
-                      }}
-                    />
-                  </Grid>
-                )
-              })}
-            </Grid>
-          </CardContent>
-          <CardActions className={classes.cardActions}>
-            <Fab onClick={handleAddKey}>
-              <AddIcon />
-            </Fab>
-            <Fab onClick={handleKeyChange}>
-              <RefreshIcon />
-            </Fab>
-            <FileUpload onUpload={file => handleUpload(file, 'key')} />
-            <FileDownload fileOutput={{ state: 'keys', message: input.keys.join('\n') }} />
-          </CardActions>
-        </Card>
+        <Actions onEncryption={encryptInput} onDecryption={decryptInput} />
       </Grid>
       <Grid item>
-        <Grid container justify='center' alignItems='center' spacing={1}>
-          <Grid item>
-            <TextField
-              name='message'
-              label='Message'
-              variant='outlined'
-              value={input.message}
-              onChange={handleInputChange}
-              className={classes.message}
-              multiline
-              rows={5}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position='start'>
-                    <MessageIcon className={classes.icon} />
-                  </InputAdornment>
-                )
-              }}
-            />
-          </Grid>
-          <Grid item>
-            <FileUpload onUpload={file => handleUpload(file, 'message')} />
-          </Grid>
-        </Grid>
-      </Grid>
-      <Grid container spacing={2} justify='center' alignItems='center'>
-        <Grid item>
-          <Button
-            variant='contained'
-            color='primary'
-            startIcon={<LockIcon />}
-            onClick={encryptInput}
-          >
-            Encrypt
-          </Button>
-        </Grid>
-
-        <Grid item>
-          <Button
-            variant='contained'
-            color='secondary'
-            startIcon={<NoEncryptionIcon />}
-            onClick={decryptInput}
-          >
-            Decrypt
-          </Button>
-        </Grid>
-      </Grid>
-      <Grid item>
-        {output.state !== '' ? (
-          <Grid container justify='center' alignItems='center' spacing={1}>
-            <Grid item>
-              <Output props={output} />
-            </Grid>
-            <Grid item>
-              <FileDownload fileOutput={output} />
-            </Grid>
-          </Grid>
-        ) : (
-          <Typography>Input Key & Message to Encrypt/Decrypt</Typography>
-        )}
+        <OutputField output={output} onCopy={handleChange} />
       </Grid>
     </Grid>
   )

@@ -51,14 +51,15 @@ export function FileUpload ({ onUpload }) {
   )
 }
 
-export function FileDownload ({ fileOutput }) {
+export function FileDownload ({ file }) {
   const { enqueueSnackbar } = useSnackbar()
+  const { state, message } = file
 
   const handleFile = (event) => {
-    const fileType = fileOutput.state === 'encrypted' ? 'text/plain;charset=hex' : 'text/plain;charset=utf8'
-    const blob = new window.Blob([fileOutput.message], { type: fileType })
-    FileSaver.saveAs(blob, fileOutput.state)
-    enqueueSnackbar(`File "${fileOutput.state}.txt" downloaded successfully`, snackbarVariants.success)
+    const fileType = state === 'encrypted' ? 'text/plain;charset=hex' : 'text/plain;charset=utf8'
+    const blob = new window.Blob([message], { type: fileType })
+    FileSaver.saveAs(blob, state)
+    enqueueSnackbar(`File "${state}.txt" downloaded successfully`, snackbarVariants.success)
   }
 
   return (

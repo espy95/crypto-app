@@ -1,19 +1,9 @@
 import React, { useState } from 'react'
-import {
-  Button,
-  Grid,
-  InputAdornment,
-  TextField,
-  Typography
-} from '@material-ui/core'
+import { Grid, TextField, Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
-import LockIcon from '@material-ui/icons/Lock'
-import MessageIcon from '@material-ui/icons/Message'
-import NoEncryptionIcon from '@material-ui/icons/NoEncryption'
-import RefreshIcon from '@material-ui/icons/Refresh'
-import VpnKeyIcon from '@material-ui/icons/VpnKey'
-import Output from '../components/Output'
-import { FileUpload, FileDownload } from '../components/FileTransfer'
+import Actions from '../components/Actions'
+import InputField from '../components/InputField'
+import OutputField from '../components/OutputField'
 import crypto from 'crypto'
 
 const useStyles = makeStyles(theme => ({
@@ -42,7 +32,7 @@ export default function CBCMode () {
     message: 'Assignment 1 Cipher-Block Chaining Mode:\ntest Message'
   })
   const [output, setOutput] = useState({
-    state: '',
+    state: 'decrypted',
     message: input.message
   })
 
@@ -66,12 +56,8 @@ export default function CBCMode () {
     return decrypted.toString()
   }
 
-  const handleInputChange = event => {
-    setInput({ ...input, [event.target.name]: event.target.value })
-  }
-
-  const handleChange = () => {
-    setInput({ ...input, key: crypto.randomBytes(16).toString('hex') })
+  const handleChange = (name, value) => {
+    setInput({ ...input, [name]: value })
   }
 
   const encryptInput = () => {
@@ -85,13 +71,6 @@ export default function CBCMode () {
     setOutput({
       state: 'decrypted',
       message: decrypt(input)
-    })
-  }
-
-  const handleUpload = (fileInput, type) => {
-    setInput({
-      ...input,
-      [type]: fileInput
     })
   }
 
@@ -112,104 +91,30 @@ export default function CBCMode () {
           variant='outlined'
           disabled
           value={input.iv}
-          onChange={handleInputChange}
+          onChange={handleChange}
           className={classes.iv}
         />
       </Grid>
       <Grid item>
-        <Grid container justify='center' alignItems='center' spacing={1}>
-          <Grid item>
-            <TextField
-              name='key'
-              label='Key'
-              variant='outlined'
-              value={input.key}
-              onChange={handleInputChange}
-              className={classes.key}
-              autoComplete='off'
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position='start'>
-                    <VpnKeyIcon className={classes.icon} />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position='end'>
-                    <Button onClick={handleChange}>
-                      <RefreshIcon className={classes.icon} />
-                    </Button>
-                  </InputAdornment>
-                )
-              }}
-            />
-          </Grid>
-          <Grid item>
-            <FileUpload onUpload={file => handleUpload(file, 'key')} />
-          </Grid>
-        </Grid>
+        <InputField name='key' input={input.key} onChange={handleChange} />
       </Grid>
       <Grid item>
-        <Grid container justify='center' alignItems='center' spacing={1}>
-          <Grid item>
-            <TextField
-              name='message'
-              label='Message'
-              variant='outlined'
-              value={input.message}
-              onChange={handleInputChange}
-              className={classes.message}
-              multiline
-              rows={5}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position='start'>
-                    <MessageIcon className={classes.icon} />
-                  </InputAdornment>
-                )
-              }}
-            />
-          </Grid>
-          <Grid item>
-            <FileUpload onUpload={file => handleUpload(file, 'message')} />
-          </Grid>
-        </Grid>
-      </Grid>
-      <Grid container spacing={2} justify='center' alignItems='center'>
-        <Grid item>
-          <Button
-            variant='contained'
-            color='primary'
-            startIcon={<LockIcon />}
-            onClick={encryptInput}
-          >
-            Encrypt
-          </Button>
-        </Grid>
-
-        <Grid item>
-          <Button
-            variant='contained'
-            color='secondary'
-            startIcon={<NoEncryptionIcon />}
-            onClick={decryptInput}
-          >
-            Decrypt
-          </Button>
-        </Grid>
+        <InputField
+          name='message'
+          input={input.message}
+          onChange={handleChange}
+          multiline
+          rows={5}
+        />
       </Grid>
       <Grid item>
-        {output.state !== '' ? (
-          <Grid container justify='center' alignItems='center' spacing={1}>
-            <Grid item>
-              <Output props={output} />
-            </Grid>
-            <Grid item>
-              <FileDownload fileOutput={output} />
-            </Grid>
-          </Grid>
-        ) : (
-          <Typography>Input Key & Message to Encrypt/Decrypt</Typography>
-        )}
+        <Actions
+          onEncryption={encryptInput}
+          onDecryption={decryptInput}
+        />
+      </Grid>
+      <Grid item>
+        <OutputField output={output} onCopy={handleChange} />
       </Grid>
     </Grid>
   )

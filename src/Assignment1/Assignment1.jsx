@@ -1,13 +1,10 @@
-import React, { useState } from 'react'
-import {
-  Grid,
-  makeStyles,
-  Tabs,
-  Tab
-} from '@material-ui/core'
+import React, { useState, useEffect } from 'react'
+import { Grid, makeStyles, Tabs, Tab, Typography } from '@material-ui/core'
 import TabPanel from '../components/TabPanel'
 import CBCMode from './CBCMode'
 import CFBMode from './CFBMode'
+import marked from 'marked'
+import path from './Task.md'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -23,7 +20,19 @@ const useStyles = makeStyles(theme => ({
 
 export default function Assignment1 () {
   const classes = useStyles()
-  const [tab, setTab] = useState(1)
+  const [taskDescription, setTaskDescription] = useState('')
+
+  useEffect(() => {
+    window
+      .fetch(path)
+      .then(response => {
+        return response.text()
+      })
+      .then(text => setTaskDescription(marked(text)))
+  })
+
+  const [tab, setTab] = useState(0)
+
   const handleChange = (event, newTab) => {
     setTab(newTab)
   }
@@ -38,15 +47,19 @@ export default function Assignment1 () {
           onChange={handleChange}
           className={classes.tabs}
         >
+          <Tab label='Task description' />
           <Tab label='Cipher-Block (CBC)' />
           <Tab label='Cipher Feedback (CFB)' />
         </Tabs>
       </Grid>
       <Grid item xs={10}>
         <TabPanel value={tab} index={0}>
-          <CBCMode />
+          <Typography dangerouslySetInnerHTML={{ __html: taskDescription }} />
         </TabPanel>
         <TabPanel value={tab} index={1}>
+          <CBCMode />
+        </TabPanel>
+        <TabPanel value={tab} index={2}>
           <CFBMode />
         </TabPanel>
       </Grid>

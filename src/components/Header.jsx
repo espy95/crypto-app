@@ -29,7 +29,7 @@ export default function Header () {
   }
 
   return (
-    <AppBar position='static' color='primary'>
+    <AppBar position='sticky' color='primary'>
       <Toolbar>
         <IconButton
           edge='start'

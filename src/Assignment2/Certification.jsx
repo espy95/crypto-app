@@ -1,4 +1,7 @@
 import React, { useState } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import delay from 'lodash/delay'
+import forge, { pki } from 'node-forge'
 import {
   CircularProgress,
   Fab,
@@ -8,8 +11,8 @@ import {
 } from '@material-ui/core'
 import NoteAddIcon from '@material-ui/icons/NoteAdd'
 import OutputField from '../components/OutputField'
-import delay from 'lodash/delay'
-import forge, { pki } from 'node-forge'
+import { getCerts } from '../reducers'
+import { createCert } from '../actions/actions'
 
 const useStyles = makeStyles(theme => ({
   longMessage: {
@@ -19,9 +22,11 @@ const useStyles = makeStyles(theme => ({
 
 export default function Certification () {
   const classes = useStyles()
+  const dispatch = useDispatch()
   const [pem, setPem] = useState({})
   const [loading, setLoading] = useState(false)
-  const caStore = pki.createCaStore()
+  const certs = useSelector(getCerts)
+  console.log('TCL: Certification -> certs', certs)
 
   const createCertificate = () => {
     setLoading(true)
@@ -48,15 +53,15 @@ export default function Certification () {
       cert.setSubject(attrs)
       cert.setIssuer(attrs)
       cert.sign(keys.privateKey, forge.md.sha256.create())
+      console.log('TCL: createCertificate -> cert', cert)
+      const certPem = pki.certificateToPem(cert)
+      console.log('TCL: createCertificate -> certPem', certPem)
       setPem({
         privateKey: pki.privateKeyToPem(keys.privateKey),
         publicKey: pki.publicKeyToPem(cert.publicKey),
         certificate: pki.certificateToPem(cert)
       })
-      caStore.addCertificate(cert)
-      const caStoreCerts = caStore.listAllCertificates.apply()
-      console.log('caStoreCerts ->', caStoreCerts)
-      console.log('pki.certificateToPem(caStoreCerts[0]) ->', pki.certificateToPem(caStoreCerts[0]))
+      dispatch(createCert(certPem))
       setLoading(false)
     }, 1000)
   }

@@ -1,11 +1,17 @@
 import React, { useState } from 'react'
 import throttle from 'lodash/throttle'
-import { Grid, Typography } from '@material-ui/core'
+import { Grid, makeStyles, Typography } from '@material-ui/core'
 import Actions from '../components/Actions'
 import InputField from '../components/InputField'
 import OutputField from '../components/OutputField'
 import crypto from 'crypto'
 import { aesCmac } from 'node-aes-cmac'
+
+const useStyles = makeStyles(theme => ({
+  message: {
+    width: 420
+  }
+}))
 
 const initialInput = {
   iv: crypto.randomBytes(16).toString('hex'),
@@ -14,6 +20,7 @@ const initialInput = {
 }
 
 export default function CFBMode () {
+  const classes = useStyles()
   const algorithm = 'aes-128-cfb'
   const [input, setInput] = useState({
     ...initialInput,
@@ -24,7 +31,7 @@ export default function CFBMode () {
   })
 
   const [output, setOutput] = useState({
-    state: '',
+    state: 'decrypted',
     message: input.message
   })
 
@@ -74,6 +81,10 @@ export default function CFBMode () {
     })
   }
 
+  const handleCopy = (outputMessage) => {
+    handleChange('message', outputMessage)
+  }
+
   return (
     <Grid
       container
@@ -107,7 +118,7 @@ export default function CFBMode () {
         <Actions onEncryption={encryptInput} onDecryption={decryptInput} />
       </Grid>
       <Grid item>
-        <OutputField output={output} onCopy={handleChange} />
+        <OutputField name={output.state} output={output.message} onCopy={handleCopy} rows={5} className={classes.message} />
       </Grid>
     </Grid>
   )

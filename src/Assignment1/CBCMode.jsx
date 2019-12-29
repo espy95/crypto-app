@@ -1,22 +1,14 @@
 import React, { useState } from 'react'
-import { Grid, TextField, Typography } from '@material-ui/core'
-import { makeStyles } from '@material-ui/core/styles'
+import { Grid, makeStyles, TextField, Typography } from '@material-ui/core'
 import Actions from '../components/Actions'
 import InputField from '../components/InputField'
 import OutputField from '../components/OutputField'
 import crypto from 'crypto'
 
 const useStyles = makeStyles(theme => ({
-  icon: {
-    color: '#808080',
-    opacity: 0.5
-  },
   iv: {
     width: 420,
     marginRight: 64
-  },
-  key: {
-    width: 420
   },
   message: {
     width: 420
@@ -74,6 +66,10 @@ export default function CBCMode () {
     })
   }
 
+  const handleCopy = (outputMessage) => {
+    handleChange('message', outputMessage)
+  }
+
   return (
     <Grid
       container
@@ -114,7 +110,7 @@ export default function CBCMode () {
         />
       </Grid>
       <Grid item>
-        <OutputField output={output} onCopy={handleChange} />
+        <OutputField name={output.state} output={output.message} onCopy={handleCopy} rows={5} className={classes.message} />
       </Grid>
     </Grid>
   )

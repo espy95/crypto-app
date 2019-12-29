@@ -1,6 +1,5 @@
 import React from 'react'
-import { Fab, Input } from '@material-ui/core'
-import { makeStyles } from '@material-ui/core/styles'
+import { Fab, Input, makeStyles } from '@material-ui/core'
 import AttachFileIcon from '@material-ui/icons/AttachFile'
 import GetAppIcon from '@material-ui/icons/GetApp'
 import { useSnackbar } from 'notistack'

@@ -1,12 +1,8 @@
 import { combineReducers } from 'redux'
-import certsReducers from './certsReducers'
-import keysReducers from './keysReducers'
+import certReducers from './certReducers'
 
 export const rootReducer = combineReducers({
-  certs: certsReducers,
-  keys: keysReducers
+  cert: certReducers
 })
 
 export default rootReducer
-
-export const getCerts = ({ state }) => state

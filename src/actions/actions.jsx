@@ -1,6 +1,5 @@
-export const createCert = (cert) => {
+export const createCert = () => {
   return {
-    type: 'CREATE_CERT',
-    payload: cert
+    type: 'CREATE_CERT'
   }
 }

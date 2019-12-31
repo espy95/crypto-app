@@ -48,7 +48,6 @@ export default function Cryption () {
   }
 
   function getKeyFromPem (pem) {
-    console.log('​getKeyFromPem -> pem', pem)
     return pem.includes('PRIVATE KEY') ? forge.pki.privateKeyFromPem(pem) : forge.pki.publicKeyFromPem(pem)
   }
 
@@ -137,7 +136,7 @@ export default function Cryption () {
         />
       </Grid>
       <Grid item>
-        {input.key && input.message && <Actions onEncryption={encryptInput} onDecryption={decryptInput} />}
+        <Actions onEncryption={encryptInput} onDecryption={decryptInput} />
       </Grid>
       <Grid item>
         <OutputField name={output.state} output={output.message} onCopy={handleCopy} rows={5} className={classes.message} />

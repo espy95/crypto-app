@@ -60,7 +60,7 @@ export default function Panel ({
 
   return (
     <ExpansionPanel expanded={expanded === name} onChange={handleExpansion}>
-      <ExpansionPanelSummary expandIcon={expandIcons[name]}>
+      <ExpansionPanelSummary expandIcon={details && expandIcons[name]}>
         <Typography className={classes.heading}>{name}</Typography>
       </ExpansionPanelSummary>
       <ExpansionPanelDetails>

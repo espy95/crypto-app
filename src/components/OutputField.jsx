@@ -3,26 +3,24 @@ import {
   Button,
   Grid,
   InputAdornment,
-  makeStyles,
   TextField
 } from '@material-ui/core'
 import DescriptionIcon from '@material-ui/icons/Description'
 import LockIcon from '@material-ui/icons/Lock'
 import NoEncryptionIcon from '@material-ui/icons/NoEncryption'
+import VpnKeyIcon from '@material-ui/icons/VpnKey'
 import SwapVertIcon from '@material-ui/icons/SwapVert'
 import { FileDownload } from './FileTransfer'
 
-const useStyles = makeStyles(theme => ({
-  icon: {
-    opacity: 0.5
-  },
-  encryptedIcon: {
-    color: theme.palette.primary.main
-  },
-  decryptedIcon: {
-    color: theme.palette.secondary.main
-  }
-}))
+const inputIcon = {
+  message: <DescriptionIcon />,
+  certificate: <DescriptionIcon />,
+  publicKey: <NoEncryptionIcon color='secondary' />,
+  decrypted: <NoEncryptionIcon color='secondary' />,
+  privateKey: <LockIcon color='primary' />,
+  encrypted: <LockIcon color='primary' />,
+  key: <VpnKeyIcon />
+}
 
 export default function OutputField ({ name, output, onCopy, ...props }) {
   const outputFile = {
@@ -30,7 +28,6 @@ export default function OutputField ({ name, output, onCopy, ...props }) {
     message: output
   }
   const color = name === 'decrypted' || name === 'publicKey' ? 'secondary' : 'primary'
-  const classes = useStyles()
 
   const handleCopy = () => {
     onCopy(output)
@@ -52,20 +49,13 @@ export default function OutputField ({ name, output, onCopy, ...props }) {
           InputProps={{
             startAdornment: (
               <InputAdornment position='start'>
-                {name === 'encrypted' || name === 'privateKey' ? (
-                  <LockIcon className={classes.encryptedIcon} />
-                ) : name === 'decrypted' || name === 'publicKey' ? (
-                  <NoEncryptionIcon className={classes.decryptedIcon} />
-                ) : (
-                  <DescriptionIcon className={classes.icon} />
-                )}
+                {inputIcon[name]}
               </InputAdornment>
             ),
             endAdornment: (
               <InputAdornment position='end'>
                 <Button onClick={handleCopy}>
-                  {name !== 'certificate' && name !== 'publicKey' && name !== 'privateKey' && <SwapVertIcon />}
-                  Copy
+                  {name === 'message' || name === 'decrypted' || name === 'encrypted' ? <SwapVertIcon /> : 'Copy'}
                 </Button>
               </InputAdornment>
             )

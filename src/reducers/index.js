@@ -1,8 +1,8 @@
 import { combineReducers } from 'redux'
-import certReducers from './certReducers'
+import certReducers from './reducers'
 
 export const rootReducer = combineReducers({
-  cert: certReducers
+  caStore: certReducers
 })
 
 export default rootReducer

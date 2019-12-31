@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { Grid, makeStyles, Tab, Tabs, Typography } from '@material-ui/core'
 import TabPanel from '../components/TabPanel'
-import Certification from './Certification'
-import Cryption from './Cryption'
+import Certification from './components/Certification'
+import Cryption from './components/Cryption'
 import marked from 'marked'
 import path from './Task.md'
 
@@ -31,7 +31,7 @@ export default function Assignment2 () {
       .then(text => setTaskDescription(marked(text)))
   })
 
-  const [tab, setTab] = useState(0)
+  const [tab, setTab] = useState(2)
 
   const handleChange = (event, newTab) => {
     setTab(newTab)

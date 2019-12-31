@@ -22,7 +22,7 @@ const snackbarVariants = {
   }
 }
 
-export function FileUpload ({ onUpload }) {
+export function FileUpload ({ onUpload, showIcon, showText, ...props }) {
   const classes = useStyles()
   const { enqueueSnackbar } = useSnackbar()
 
@@ -43,9 +43,10 @@ export function FileUpload ({ onUpload }) {
   }
 
   return (
-    <Fab component='label'>
+    <Fab component='label' {...props}>
       <Input type='file' className={classes.hidden} onChange={handleFile} />
-      <AttachFileIcon />
+      {showIcon || <AttachFileIcon />}
+      {showText}
     </Fab>
   )
 }
@@ -55,7 +56,7 @@ export function FileDownload ({ file }) {
   const { state, message } = file
 
   const handleFile = (event) => {
-    const fileType = state === 'encrypted' ? 'text/plain;charset=hex' : 'text/plain;charset=utf8'
+    const fileType = state === 'encrypted' ? 'octet/stream' : 'text/plain;charset=utf8'
     const blob = new window.Blob([message], { type: fileType })
     FileSaver.saveAs(blob, state)
     enqueueSnackbar(`File "${state}.txt" downloaded successfully`, snackbarVariants.success)

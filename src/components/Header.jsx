@@ -34,9 +34,6 @@ export default function Header () {
         <IconButton
           edge='start'
           color='inherit'
-          aria-controls='menu'
-          aria-haspopup='true'
-          aria-label='menu'
           onClick={handleClick}
         >
           <MenuIcon />

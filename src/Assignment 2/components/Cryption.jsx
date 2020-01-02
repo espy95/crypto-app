@@ -19,14 +19,15 @@ export default function Cryption () {
   const classes = useStyles()
   const pems = useSelector(getCertPems)
   const [input, setInput] = useState({
-    key: pems.privateKey || pems.publicKey,
+    key: pems.publicKey,
     message: 'Assignment 2: Cryption with Certificate public key:\ntest Message'
   })
 
   useEffect(() => {
     setInput({
       ...input,
-      key: pems.privateKey || pems.publicKey
+      publicKey: pems.publicKey,
+      privateKey: pems.privateKey
     })
   }, [pems])
 
@@ -47,30 +48,18 @@ export default function Cryption () {
     })
   }
 
-  function getKeyFromPem (pem) {
-    return pem.includes('PRIVATE KEY') ? forge.pki.privateKeyFromPem(pem) : forge.pki.publicKeyFromPem(pem)
-  }
-
   const encrypt = props => {
-    const iv = forge.random.getBytesSync(16)
-    const key = getKeyFromPem(input.key)
+    const key = forge.pki.publicKeyFromPem(props.publicKey)
     const message = Buffer.from(props.message, 'utf8')
-    const cipher = forge.cipher.createCipher('AES-CBC', key)
-    cipher.start({ iv: iv })
-    cipher.update(forge.util.createBuffer(message))
-    cipher.finish()
-    return cipher.output.toHex()
+    const encrypted = key.encrypt(message, 'RSAES-PKCS1-V1_5')
+    return forge.util.bytesToHex(encrypted)
   }
 
   const decrypt = props => {
-    const iv = Buffer.from(props.iv, 'hex')
-    const key = Buffer.from(props.key, 'hex')
+    const key = forge.pki.privateKeyFromPem(props.privateKey)
     const encryptedMessage = Buffer.from(props.message, 'hex')
-    const decipher = forge.cipher.createDecipher('AES-CBC', key)
-    decipher.start({ iv: iv })
-    decipher.update(forge.util.createBuffer(encryptedMessage))
-    decipher.finish()
-    return decipher.output.toString()
+    const decrypted = key.decrypt(encryptedMessage, 'RSAES-PKCS1-V1_5')
+    return decrypted
   }
 
   const encryptInput = () => {
@@ -128,19 +117,38 @@ export default function Cryption () {
       </Grid>
       <Grid item>
         <Panel
-          name='key'
+          name='publicKey'
           expanded={expanded}
           onChange={handleExpansion}
-          details={input.key}
-          outputRows={30}
+          details={input.publicKey}
+          outputRows={10}
         />
       </Grid>
       <Grid item>
-        <Actions onEncryption={encryptInput} onDecryption={decryptInput} />
+        <Panel
+          name='privateKey'
+          expanded={expanded}
+          onChange={handleExpansion}
+          details={input.privateKey}
+          outputRows={30}
+        />
       </Grid>
-      <Grid item>
-        <OutputField name={output.state} output={output.message} onCopy={handleCopy} rows={5} className={classes.message} />
-      </Grid>
+      {input.publicKey && input.privateKey && input.message && (
+        <Grid
+          container
+          direction='column'
+          justify='center'
+          alignItems='center'
+          spacing={2}
+        >
+          <Grid item>
+            <Actions onEncryption={encryptInput} onDecryption={decryptInput} />
+          </Grid>
+          <Grid item>
+            <OutputField name={output.state} output={output.message} onCopy={handleCopy} rows={5} className={classes.message} />
+          </Grid>
+        </Grid>
+      )}
     </Grid>
   )
 }

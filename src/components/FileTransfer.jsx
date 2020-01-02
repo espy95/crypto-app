@@ -4,6 +4,7 @@ import AttachFileIcon from '@material-ui/icons/AttachFile'
 import GetAppIcon from '@material-ui/icons/GetApp'
 import { useSnackbar } from 'notistack'
 import FileSaver from 'file-saver'
+import forge from 'node-forge'
 
 const useStyles = makeStyles(theme => ({
   hidden: {
@@ -33,7 +34,11 @@ export function FileUpload ({ onUpload, showIcon, showText, ...props }) {
         const reader = new window.FileReader()
         reader.readAsText(file)
         reader.onload = (event) => {
-          onUpload(event.target.result)
+          if (file.name.includes('encrypted')) {
+            onUpload(forge.util.bytesToHex(event.target.result))
+          } else {
+            onUpload(event.target.result)
+          }
         }
         enqueueSnackbar(`File "${file.name}" uploaded successfully`, snackbarVariants.success)
       } else {
@@ -56,10 +61,22 @@ export function FileDownload ({ file }) {
   const { state, message } = file
 
   const handleFile = (event) => {
-    const fileType = state === 'encrypted' ? 'octet/stream' : 'text/plain;charset=utf8'
-    const blob = new window.Blob([message], { type: fileType })
-    FileSaver.saveAs(blob, state)
-    enqueueSnackbar(`File "${state}.txt" downloaded successfully`, snackbarVariants.success)
+    try {
+      if (state === 'encrypted') {
+        const fileType = 'octet/stream'
+        const encryptedMessage = forge.util.hexToBytes(message)
+        const blob = new window.Blob([encryptedMessage], { type: fileType })
+        FileSaver.saveAs(blob, state)
+        enqueueSnackbar(`File "${state}" downloaded successfully`, snackbarVariants.success)
+      } else {
+        const fileType = 'text/plain;charset=utf8'
+        const blob = new window.Blob([message], { type: fileType })
+        FileSaver.saveAs(blob, state)
+        enqueueSnackbar(`File "${state}.txt" downloaded successfully`, snackbarVariants.success)
+      }
+    } catch (error) {
+      enqueueSnackbar('File download failed', snackbarVariants.error)
+    }
   }
 
   return (

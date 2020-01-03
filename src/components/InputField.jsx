@@ -10,7 +10,7 @@ import MessageIcon from '@material-ui/icons/Message'
 import RefreshIcon from '@material-ui/icons/Refresh'
 import VpnKeyIcon from '@material-ui/icons/VpnKey'
 import { FileUpload } from './FileTransfer'
-import crypto from 'crypto'
+import forge from 'node-forge'
 
 const useStyles = makeStyles(theme => ({
   textField: {
@@ -37,7 +37,7 @@ export default function InputField ({ name, input, onChange, ...props }) {
   }, [input])
 
   const handleRefresh = () => {
-    const randomKey = crypto.randomBytes(16).toString('hex')
+    const randomKey = forge.util.bytesToHex(forge.random.getBytesSync(16))
     setValue(randomKey)
     onChange(name, randomKey)
   }

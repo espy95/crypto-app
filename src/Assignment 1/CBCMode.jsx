@@ -42,7 +42,6 @@ export default function CBCMode () {
     const inBlock = forge.util.createBuffer(message.getBytes(cipher.blockSize))
     while (inBlock.length() < cipher.blockSize) inBlock.putByte(0)
     cipher.update(inBlock)
-    // console.log(cipher.output.toHex())
     return cipher.output.toHex()
   }
 

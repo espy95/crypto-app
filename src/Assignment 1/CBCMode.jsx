@@ -40,7 +40,8 @@ export default function CBCMode () {
     }
     // Final block
     const inBlock = forge.util.createBuffer(message.getBytes(cipher.blockSize))
-    while (inBlock.length() < cipher.blockSize) inBlock.putByte(0)
+    const pad = cipher.blockSize - inBlock.length()
+    while (inBlock.length() < cipher.blockSize) inBlock.putByte(pad)
     cipher.update(inBlock)
     return cipher.output.toHex()
   }
@@ -48,14 +49,15 @@ export default function CBCMode () {
   const decrypt = props => {
     const iv = forge.util.createBuffer(props.iv, 'hex')
     const key = forge.util.createBuffer(props.key, 'hex')
-    const encryptedMessage = forge.util.createBuffer(forge.util.hexToBytes(props.message))
+    const encryptedMessage = forge.util.createBuffer(forge.util.hexToBytes(props.message), 'hex')
     const decipher = forge.cipher.createDecipher(algorithm, key)
     decipher.start({ iv: iv })
     decipher.update(encryptedMessage)
     // Remove padding from final block
     const outBlock = Buffer.from(decipher.output.toHex(), 'hex')
-    const paddingIndex = outBlock.findIndex((i) => i === 0)
-    return outBlock.slice(0, paddingIndex)
+    const pad = outBlock[outBlock.length - 1] < 16 ? outBlock.length - outBlock[outBlock.length - 1] : outBlock.length
+    const output = outBlock.slice(0, pad)
+    return Buffer.from(output).toString('utf8')
   }
 
   const handleChange = (name, value) => {

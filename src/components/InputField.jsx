@@ -75,7 +75,7 @@ export default function InputField ({ name, input, onChange, ...props }) {
             ),
             endAdornment: (
               <InputAdornment position='end'>
-                {name !== 'message' && name !== 'macKey' && (
+                {name !== 'message' && (
                   <Button onClick={handleRefresh}>
                     <RefreshIcon className={classes.icon} />
                   </Button>

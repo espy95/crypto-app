@@ -40,10 +40,11 @@ Your task is to create a program that encrypts and decrypts a given text using a
 cipher** of your choice: AES, 3DES, IDEA etc. (DES is also acceptable, but not recommended) and
 encrypts/decrypts using the following chaining modes:
 
-```
+
 a) **CBC** chaining mode;
-b) either **CFB or OFB** chaining mode (you can chose which one you want).
-```
+
+b) either **CFB or OFB** chaining mode (you can choose which one you want).
+
 The program should take as input a string of arbitrary length and a key, encrypt (decrypt) the string
 using the key and output the result.
 
@@ -52,8 +53,6 @@ Different chaining modes are described in chapter 9 of Applied Cryptography.
 For **CBC mode** it is required that the **length of the output must be the same as the length of the
 input**. Hence, you must deal with the possibility that the input may not be an even multiple of the
 block length, and you must implement a method of some sort to deal with this problem. (However,
-
-
 you can assume that the length of the input will be at least the size of one block.) As a consequence,
 you should assume that initialization vector is constant for all encryptions (e.g. all bits are zeroes).
 
@@ -78,9 +77,10 @@ from a pass-phrase) and saving them to files. If your cryptographic library supp
 
 Formally, the requirements are the following:
 
-**- Input:** An arbitrary length string, a key (or keys), (for CFB/OFB decryption) a MAC value (if
+* **Input:** An arbitrary length string, a key (or keys), (for CFB/OFB decryption) a MAC value (if
 stored separately), a choice of chaining mode and a choice of whether to encrypt or decrypt.
-**- Output:** An file with encryption/decryption of the string under the specified chaining mode with
+
+* **Output:** An file with encryption/decryption of the string under the specified chaining mode with
 the specified key (for CFB/OFB encryption – a file with MAC code, if you chose to store the code
 separately), (for CFB/OFB decryption) the information (could be in any format – shown in GUI,
 printed on screen, stored in file etc.) whether the MAC value is correct.

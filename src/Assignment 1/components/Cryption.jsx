@@ -5,7 +5,6 @@ const zero = '00000000000000000000000000000000'
 const Rb = Buffer.from('00000000000000000000000000000087', 'hex')
 
 export const encrypt = ({ ...props }) => {
-  console.log('​encrypt -> props', props)
   const iv = forge.util.createBuffer(props.iv, 'hex')
   const key = forge.util.createBuffer(props.key, 'hex')
   const message = forge.util.createBuffer(props.message, 'utf8')
@@ -59,17 +58,11 @@ export const cmac = ({ ...props }) => {
   let x = Buffer.from(zero, 'hex')
   let y
 
-  console.log('cmac for start')
   for (let index = 0; index < lastBlockIndex; index++) {
     y = xor(x, getMessageBlock(props.message, index))
-    console.log('​cmac -> props', props)
-    console.log('​cmac -> y', y)
     x = encrypt({ ...props, message: y })
   }
-  console.log('cmac for end')
   y = xor(lastBlock, x)
-  console.log('​cmac -> props', props)
-  console.log('​cmac -> y', y)
   return encrypt({ ...props, message: y })
 }
 
@@ -115,9 +108,7 @@ function getMessageBlock (message, blockIndex) {
   const block = new Buffer(blockSize)
   const start = blockIndex * blockSize
   const end = start + blockSize
-
-  message.copy(block, 0, start, end)
-
+  block.set(Buffer.from(message.slice(start, end)))
   return block
 }
 
@@ -125,10 +116,7 @@ function getPaddedMessageBlock (message, blockIndex) {
   const block = new Buffer(blockSize)
   const start = blockIndex * blockSize
   const end = message.length
-
-  block.fill(0)
-  message.copy(block, 0, start, end)
+  block.set(Buffer.from(message.slice(start, end)))
   block[end - start] = 0x80
-
   return block
 }

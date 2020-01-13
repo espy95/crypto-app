@@ -5,6 +5,7 @@ import InputField from '../../components/InputField'
 import OutputField from '../../components/OutputField'
 import forge from 'node-forge'
 import { encrypt, decrypt, cmac } from './Cryption'
+import { aesCmac } from 'node-aes-cmac'
 
 const useStyles = makeStyles(theme => ({
   message: {
@@ -39,16 +40,20 @@ export default function CFBMode () {
     setOutput({
       state: 'encrypted',
       message: encrypt(input),
-      mac: cmac(input)
+      mac: cmac({ ...input, key: input.macKey })
     })
+    console.log('encryption cmac', cmac({ ...input, key: input.macKey }))
+    console.log('aesCmac', aesCmac(input.macKey, input.message))
   }
 
   const decryptInput = () => {
     setOutput({
       state: 'decrypted',
       message: decrypt(input),
-      mac: cmac(input)
+      mac: output.mac === cmac({ ...input, key: input.macKey })
     })
+    console.log('decryption cmac', cmac({ ...input, key: input.macKey }))
+    console.log('aesCmac', aesCmac(input.macKey, input.message))
   }
 
   const handleCopy = (outputMessage) => {

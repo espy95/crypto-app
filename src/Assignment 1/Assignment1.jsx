@@ -31,7 +31,7 @@ export default function Assignment1 () {
       .then(text => setTaskDescription(marked(text)))
   })
 
-  const [tab, setTab] = useState(2)
+  const [tab, setTab] = useState(0)
 
   const handleChange = (event, newTab) => {
     setTab(newTab)

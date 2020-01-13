@@ -24,7 +24,15 @@ export default function Verify () {
     setStatus('verify')
   }, [cert])
 
+  const isEqual = (a, b) => {
+    return JSON.stringify(a) === JSON.stringify(b)
+  }
+
   const verifyCertificate = () => {
+    if (!isEqual(cert.subject, cert.issuer)) {
+      setStatus('refuted')
+      return
+    }
     try {
       cert.verify(cert)
       setStatus('verified')

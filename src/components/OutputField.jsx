@@ -19,7 +19,19 @@ const inputIcon = {
   decrypted: <NoEncryptionIcon color='secondary' />,
   privateKey: <LockIcon color='primary' />,
   encrypted: <LockIcon color='primary' />,
-  key: <VpnKeyIcon />
+  key: <VpnKeyIcon />,
+  mac: <VpnKeyIcon color='primary' />
+}
+
+const copyIcon = {
+  message: <SwapVertIcon />,
+  certificate: 'Copy',
+  publicKey: 'Copy',
+  decrypted: <SwapVertIcon color='secondary' />,
+  privateKey: 'Copy',
+  encrypted: <SwapVertIcon color='primary' />,
+  key: 'Copy',
+  mac: ''
 }
 
 export default function OutputField ({ name, output, onCopy, ...props }) {
@@ -30,6 +42,7 @@ export default function OutputField ({ name, output, onCopy, ...props }) {
   const color = name === 'decrypted' || name === 'publicKey' ? 'secondary' : 'primary'
 
   const handleCopy = () => {
+    if (onCopy === undefined) return
     onCopy(output)
   }
 
@@ -39,7 +52,7 @@ export default function OutputField ({ name, output, onCopy, ...props }) {
         <TextField
           {...props}
           id={name + 'Output'}
-          label={name}
+          label={name.toUpperCase()}
           variant='outlined'
           value={output}
           readOnly
@@ -55,7 +68,7 @@ export default function OutputField ({ name, output, onCopy, ...props }) {
             endAdornment: (
               <InputAdornment position='end'>
                 <Button onClick={handleCopy}>
-                  {name === 'message' || name === 'decrypted' || name === 'encrypted' ? <SwapVertIcon /> : 'Copy'}
+                  {copyIcon[name]}
                 </Button>
               </InputAdornment>
             )

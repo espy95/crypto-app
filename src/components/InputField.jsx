@@ -14,13 +14,13 @@ import forge from 'node-forge'
 
 const useStyles = makeStyles(theme => ({
   textField: {
-    width: 420
+    width: 600
   },
   icon: {
     color: '#808080',
     opacity: 0.5
   },
-  mac: {
+  macKey: {
     color: theme.palette.primary.main
   },
   key: {
@@ -66,7 +66,7 @@ export default function InputField ({ name, input, onChange, ...props }) {
           InputProps={{
             startAdornment: (
               <InputAdornment position='start'>
-                {name === 'key' || name === 'mac' ? (
+                {name === 'key' || name === 'macKey' ? (
                   <VpnKeyIcon className={`${classes.icon} ${classes[name]}`} />
                 ) : name === 'message' && (
                   <MessageIcon className={classes.icon} />
@@ -75,7 +75,7 @@ export default function InputField ({ name, input, onChange, ...props }) {
             ),
             endAdornment: (
               <InputAdornment position='end'>
-                {name !== 'message' && name !== 'mac' && (
+                {name !== 'message' && name !== 'macKey' && (
                   <Button onClick={handleRefresh}>
                     <RefreshIcon className={classes.icon} />
                   </Button>

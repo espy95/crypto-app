@@ -1,24 +1,25 @@
 import React, { useState } from 'react'
 import { Grid, makeStyles, TextField, Typography } from '@material-ui/core'
-import Actions from '../components/Actions'
-import InputField from '../components/InputField'
-import OutputField from '../components/OutputField'
+import Actions from '../../components/Actions'
+import InputField from '../../components/InputField'
+import OutputField from '../../components/OutputField'
 import forge from 'node-forge'
+import { encrypt, decrypt } from './Cryption'
 
 const useStyles = makeStyles(theme => ({
   iv: {
-    width: 420,
+    width: 600,
     marginRight: 64
   },
   message: {
-    width: 420
+    width: 600
   }
 }))
 
 export default function CBCMode () {
-  const algorithm = 'AES-CBC'
   const classes = useStyles()
   const [input, setInput] = useState({
+    algorithm: 'AES-CBC',
     iv: '00000000000000000000000000000000',
     key: forge.util.bytesToHex(forge.random.getBytesSync(16)),
     message: 'Assignment 1 Cipher-Block Chaining Mode:\ntest Message'
@@ -27,38 +28,6 @@ export default function CBCMode () {
     state: 'decrypted',
     message: input.message
   })
-
-  const encrypt = props => {
-    const iv = forge.util.createBuffer(props.iv, 'hex')
-    const key = forge.util.createBuffer(props.key, 'hex')
-    const message = forge.util.createBuffer(props.message, 'utf8')
-    const cipher = forge.cipher.createCipher(algorithm, key)
-    cipher.start({ iv: iv })
-    while (message.length() > cipher.blockSize) {
-      const inBlock = forge.util.createBuffer(message.getBytes(cipher.blockSize))
-      cipher.update(inBlock)
-    }
-    // Final block
-    const inBlock = forge.util.createBuffer(message.getBytes(cipher.blockSize))
-    const pad = cipher.blockSize - inBlock.length()
-    while (inBlock.length() < cipher.blockSize) inBlock.putByte(pad)
-    cipher.update(inBlock)
-    return cipher.output.toHex()
-  }
-
-  const decrypt = props => {
-    const iv = forge.util.createBuffer(props.iv, 'hex')
-    const key = forge.util.createBuffer(props.key, 'hex')
-    const encryptedMessage = forge.util.createBuffer(forge.util.hexToBytes(props.message), 'hex')
-    const decipher = forge.cipher.createDecipher(algorithm, key)
-    decipher.start({ iv: iv })
-    decipher.update(encryptedMessage)
-    // Remove padding from final block
-    const outBlock = Buffer.from(decipher.output.toHex(), 'hex')
-    const pad = outBlock[outBlock.length - 1] < 16 ? outBlock.length - outBlock[outBlock.length - 1] : outBlock.length
-    const output = outBlock.slice(0, pad)
-    return Buffer.from(output).toString('utf8')
-  }
 
   const handleChange = (name, value) => {
     setInput({ ...input, [name]: value })
@@ -91,7 +60,7 @@ export default function CBCMode () {
       spacing={2}
     >
       <Grid item>
-        <Typography variant='h4'>Cipher-Block Chaining Mode ({algorithm})</Typography>
+        <Typography variant='h4'>Cipher-Block Chaining Mode ({input.algorithm})</Typography>
       </Grid>
       <Grid item>
         <TextField
@@ -112,7 +81,7 @@ export default function CBCMode () {
           input={input.message}
           onChange={handleChange}
           multiline
-          rows={5}
+          rows={7}
         />
       </Grid>
       <Grid item>
@@ -122,7 +91,7 @@ export default function CBCMode () {
         />
       </Grid>
       <Grid item>
-        <OutputField name={output.state} output={output.message} onCopy={handleCopy} rows={5} className={classes.message} />
+        <OutputField name={output.state} output={output.message} onCopy={handleCopy} rows={7} className={classes.message} />
       </Grid>
     </Grid>
   )

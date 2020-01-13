@@ -11,7 +11,7 @@ import forge from 'node-forge'
 
 const useStyles = makeStyles(theme => ({
   message: {
-    width: 420
+    width: 600
   }
 }))
 
@@ -145,7 +145,7 @@ export default function Cryption () {
             <Actions onEncryption={encryptInput} onDecryption={decryptInput} />
           </Grid>
           <Grid item>
-            <OutputField name={output.state} output={output.message} onCopy={handleCopy} rows={5} className={classes.message} />
+            <OutputField name={output.state} output={output.message} onCopy={handleCopy} rows={10} className={classes.message} />
           </Grid>
         </Grid>
       )}

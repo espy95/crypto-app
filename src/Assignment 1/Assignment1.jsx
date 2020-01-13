@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { Grid, makeStyles, Tabs, Tab, Typography } from '@material-ui/core'
 import TabPanel from '../components/TabPanel'
-import CBCMode from './CBCMode'
-import CFBMode from './CFBMode'
+import CBCMode from './components/CBCMode'
+import CFBMode from './components/CFBMode'
 import marked from 'marked'
 import path from './Task.md'
 
@@ -31,7 +31,7 @@ export default function Assignment1 () {
       .then(text => setTaskDescription(marked(text)))
   })
 
-  const [tab, setTab] = useState(1)
+  const [tab, setTab] = useState(2)
 
   const handleChange = (event, newTab) => {
     setTab(newTab)
